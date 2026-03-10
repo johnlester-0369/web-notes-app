@@ -511,9 +511,6 @@
       .fab { display: inline-flex; }
       .app-bar__new-btn { display: none !important; }
 
-      /* Back button navigates from editor back to sidebar panel */
-      .back-btn { display: inline-flex !important; }
-
       /* Extra bottom padding clears the FAB */
       .editor__content { padding: 20px 20px 80px; }
       .editor__footer  { padding: 6px 20px; }
@@ -527,7 +524,6 @@
     }
 
     /* ── Default visibility states ── */
-    .back-btn           { display: none; }
     .sidebar-toggle-btn { display: none; }
 
     @media (max-width: 639px) {
@@ -614,12 +610,9 @@
       </div>
     </div>
 
-    <!-- Active note editor panel -->
+
     <div id="editorPanel" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
       <div class="editor__toolbar">
-        <button class="btn-icon back-btn" id="backBtn" aria-label="Back to list">
-          <i data-lucide="chevron-left" aria-hidden="true"></i>
-        </button>
         <div class="editor__meta">
           <span class="editor__date" id="editorDate" aria-label="Last modified"></span>
           <!-- Save indicator lives below the date; occupies reserved height so layout is stable -->
@@ -954,9 +947,6 @@
   document.getElementById('searchInput').addEventListener('input', e => {
     renderNotesList(e.target.value);
   });
-
-  // Mobile: back button opens the slide-in sidebar to return to the list
-  document.getElementById('backBtn').addEventListener('click', openSidebar);
 
   // Mobile: hamburger in app bar toggles sidebar
   document.getElementById('sidebarToggleBtn').addEventListener('click', () => {
