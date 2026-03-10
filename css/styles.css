@@ -1,0 +1,533 @@
+/* ── Design tokens — raw RGB channels, consumed via rgb(var(--token)) ── */
+:root {
+  --color-primary:              68 114 210;
+  --color-on-primary:           255 255 255;
+  --color-primary-container:    221 232 254;
+  --color-on-primary-container: 26 48 95;
+
+  --color-surface:                255 255 255;
+  --color-on-surface:             15 20 30;
+  --color-on-surface-variant:     75 90 110;
+  --color-surface-container-low:  248 250 252;
+  --color-surface-container:      241 245 249;
+  --color-surface-container-high: 227 233 241;
+
+  --color-outline:         180 196 216;
+  --color-outline-variant: 210 220 234;
+
+  --color-error:           220 38 38;
+  --color-error-container: 255 228 228;
+
+  --color-shadow: 0 0 0;
+
+  /* Layout constants — CSS-variable-driven so breakpoints only override the var */
+  --sidebar-w: 280px;
+  --appbar-h:  56px;
+  --transition: 0.22s;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: rgb(var(--color-surface-container-low));
+  color: rgb(var(--color-on-surface));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── App bar ── */
+.app-bar {
+  height: var(--appbar-h);
+  background: rgb(var(--color-surface));
+  border-bottom: 1px solid rgb(var(--color-outline-variant));
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+  flex-shrink: 0;
+  z-index: 20;
+  box-shadow: 0 1px 0 rgb(var(--color-outline-variant));
+}
+
+/* Branded logo chip — anchors app identity without a full wordmark */
+.app-bar__logo {
+  width: 28px;
+  height: 28px;
+  background: rgb(var(--color-primary));
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+}
+
+.app-bar__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgb(var(--color-on-surface));
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+/* ── Button system ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: rgb(var(--color-primary));
+  color: rgb(var(--color-on-primary));
+}
+.btn-primary:hover  { opacity: 0.88; box-shadow: 0 2px 8px rgba(var(--color-primary), 0.3); }
+.btn-primary:active { opacity: 0.80; }
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: rgb(var(--color-on-surface-variant));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.btn-icon:hover { background: rgb(var(--color-surface-container)); color: rgb(var(--color-on-surface)); }
+
+/* Red affordance signals destructive action before click */
+.btn-icon.danger:hover {
+  background: rgb(var(--color-error-container));
+  color: rgb(var(--color-error));
+}
+
+/* ── Layout shell ── */
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Mobile overlay — dims content behind open sidebar ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: var(--appbar-h);
+  inset-inline: 0;
+  bottom: 0;
+  background: rgba(var(--color-shadow), 0.28);
+  z-index: 9;
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none; /* opacity:0 does NOT disable pointer events — without this the transparent overlay blocks all editor clicks on mobile */
+}
+.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: rgb(var(--color-surface));
+  border-right: 1px solid rgb(var(--color-outline-variant));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar__header {
+  padding: 14px 12px 12px;
+  border-bottom: 1px solid rgb(var(--color-outline-variant));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sidebar__header-row {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar__section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(var(--color-on-surface-variant));
+  flex: 1;
+}
+
+/* Pill badge makes note count feel like a status chip, not raw copy */
+.sidebar__count-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgb(var(--color-on-surface-variant));
+  background: rgb(var(--color-surface-container));
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ── Search ── */
+.search-wrapper { position: relative; }
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(var(--color-on-surface-variant));
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  background: rgb(var(--color-surface-container-low));
+  border: 1.5px solid rgb(var(--color-outline-variant));
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  color: rgb(var(--color-on-surface));
+  outline: none;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.search-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.5; }
+.search-input:focus {
+  border-color: rgb(var(--color-primary));
+  background: rgb(var(--color-surface));
+  /* Soft glow ring — consistent with input focus convention throughout the app */
+  box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+}
+
+/* ── Notes list ── */
+.notes-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px 8px;
+}
+
+/* Thin scrollbar — doesn't compete visually with note content */
+.notes-list::-webkit-scrollbar { width: 3px; }
+.notes-list::-webkit-scrollbar-track { background: transparent; }
+.notes-list::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-outline-variant));
+  border-radius: 2px;
+}
+
+.note-item {
+  padding: 11px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+}
+.note-item:hover { background: rgb(var(--color-surface-container-low)); }
+
+/* Primary-container communicates selection without heavy visual weight */
+.note-item.active {
+  background: rgb(var(--color-primary-container));
+  border-color: rgba(var(--color-primary), 0.18);
+}
+
+.note-item__title {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgb(var(--color-on-surface));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+.note-item.active .note-item__title { color: rgb(var(--color-on-primary-container)); }
+
+.note-item__preview {
+  font-size: 12.5px;
+  color: rgb(var(--color-on-surface-variant));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.note-item__date {
+  font-size: 11px;
+  color: rgb(var(--color-on-surface-variant));
+  opacity: 0.6;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px 32px;
+  gap: 4px;
+  color: rgb(var(--color-on-surface-variant));
+  text-align: center;
+}
+.empty-state__icon { opacity: 0.28; margin-bottom: 8px; }
+.empty-state__label { font-size: 13.5px; font-weight: 500; }
+.empty-state__sublabel { font-size: 12px; opacity: 0.65; margin-top: 3px; }
+
+/* ── Editor area ── */
+.editor-area {
+  flex: 1;
+  min-width: 0; /* prevent flex child from overflowing on narrow viewports */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgb(var(--color-surface));
+}
+
+.editor__toolbar {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 48px;
+  border-bottom: 1px solid rgb(var(--color-outline-variant));
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.editor__meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+}
+
+.editor__date {
+  font-size: 12px;
+  color: rgb(var(--color-on-surface-variant));
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fades in/out below the date — doesn't shift layout when hidden */
+.editor__save-status {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgb(var(--color-primary));
+  height: 14px;
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+.editor__save-status.hidden { opacity: 0; }
+
+/* Scrollable writing surface — separate from the sticky toolbar and stats bar */
+.editor__scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.editor__scroll::-webkit-scrollbar { width: 4px; }
+.editor__scroll::-webkit-scrollbar-track { background: transparent; }
+.editor__scroll::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-outline-variant));
+  border-radius: 2px;
+}
+
+/* Max-width constrains line length for comfortable reading at ~70 chars */
+.editor__content {
+  padding: 32px 48px 48px;
+  max-width: 740px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.editor__title-input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: rgb(var(--color-on-surface));
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  padding: 0;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin-bottom: 2px;
+}
+.editor__title-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.28; }
+
+/* Horizontal rule separates title from body — improves visual hierarchy without a border on inputs */
+.editor__divider {
+  height: 1px;
+  background: rgb(var(--color-outline-variant));
+  margin: 14px 0 16px;
+}
+
+.editor__body-input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgb(var(--color-on-surface));
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  flex: 1;
+  resize: none;
+  min-height: 240px;
+  padding: 0;
+}
+.editor__body-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.3; }
+
+/* Stats footer — lightweight reference, not a distraction */
+.editor__footer {
+  border-top: 1px solid rgb(var(--color-outline-variant));
+  padding: 6px 48px;
+  display: flex;
+  gap: 16px;
+  flex-shrink: 0;
+  background: rgb(var(--color-surface));
+}
+
+.editor__stat {
+  font-size: 11.5px;
+  color: rgb(var(--color-on-surface-variant));
+  opacity: 0.55;
+}
+
+/* ── No-selection placeholder ── */
+.no-note-selected {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgb(var(--color-on-surface-variant));
+  background: rgb(var(--color-surface-container-low));
+  user-select: none;
+  padding: 32px;
+  text-align: center;
+}
+.no-note-selected__icon { opacity: 0.18; margin-bottom: 4px; }
+.no-note-selected__text { font-size: 16px; font-weight: 500; opacity: 0.6; }
+.no-note-selected__hint { font-size: 13px; opacity: 0.4; }
+.no-note-selected__cta  { margin-top: 12px; }
+
+/* ── Mobile FAB — floats above content, replaces header button ── */
+.fab {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: rgb(var(--color-primary));
+  color: white;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  /* Elevated shadow to float above the writing surface */
+  box-shadow: 0 4px 16px rgba(var(--color-primary), 0.38);
+  z-index: 25;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.fab:hover  { transform: scale(1.04); box-shadow: 0 6px 20px rgba(var(--color-primary), 0.44); }
+.fab:active { transform: scale(0.96); }
+
+/* ── Responsive breakpoints ── */
+
+/* Tablet: narrower sidebar via variable override — no other layout change needed */
+@media (max-width: 900px) and (min-width: 640px) {
+  :root { --sidebar-w: 240px; }
+  .editor__content { padding: 28px 36px 40px; }
+  .editor__footer  { padding: 6px 36px; }
+}
+
+/* Mobile: sidebar becomes a fixed slide-in overlay */
+@media (max-width: 639px) {
+  .sidebar {
+    position: fixed;
+    top: var(--appbar-h);
+    left: 0;
+    bottom: 0;
+    width: min(300px, 82vw);
+    z-index: 10;
+    /* Starts off-screen; `.open` slides it in */
+    transform: translateX(-100%);
+    transition: transform var(--transition) ease;
+    box-shadow: 4px 0 24px rgba(var(--color-shadow), 0.1);
+  }
+
+  .sidebar.open { transform: translateX(0); }
+
+  /* Overlay backdrop is only meaningful on mobile */
+  .sidebar-overlay { display: block; }
+
+  /* FAB replaces header New Note button on mobile */
+  .fab { display: inline-flex; }
+  .app-bar__new-btn { display: none !important; }
+
+  /* Extra bottom padding clears the FAB */
+  .editor__content { padding: 20px 20px 80px; }
+  .editor__footer  { padding: 6px 20px; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .app-bar        { padding: 0 12px; gap: 8px; }
+  .editor__content { padding: 16px 16px 80px; }
+  .editor__footer  { padding: 6px 16px; }
+}
+
+/* ── Default visibility states ── */
+.sidebar-toggle-btn { display: none; }
+
+@media (max-width: 639px) {
+  .sidebar-toggle-btn { display: inline-flex; }
+}
+
+/* ── Lucide SVG sizing — per-context overrides ── */
+.app-bar__logo  svg                  { width: 15px; height: 15px; }
+.btn-primary    svg                  { width: 16px; height: 16px; }
+.search-icon, .search-icon svg       { width: 15px; height: 15px; }
+.no-note-selected__icon svg          { width: 56px; height: 56px; display: block; }
+.empty-state__icon svg               { width: 32px; height: 32px; display: block; }
+.fab svg                             { width: 24px; height: 24px; }
+
+/* Keyboard focus ring — visible for accessibility, suppressed on mouse */
+:focus-visible {
+  outline: 2px solid rgb(var(--color-primary));
+  outline-offset: 2px;
+}
