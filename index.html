@@ -6,40 +6,46 @@
   <title>Notes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <!-- DM Sans: clean humanist sans-serif; approachable without being bland -->
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
-  <!-- Lucide UMD build — exposes global `lucide`; must load before createIcons() calls in the init block -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <!-- Lucide UMD build — exposes global `lucide`; must load before createIcons() calls -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     /* ── Design tokens — raw RGB channels, consumed via rgb(var(--token)) ── */
     :root {
-      --color-primary: 68 114 210;
-      --color-on-primary: 255 255 255;
-      --color-primary-container: 221 232 254;
+      --color-primary:              68 114 210;
+      --color-on-primary:           255 255 255;
+      --color-primary-container:    221 232 254;
       --color-on-primary-container: 26 48 95;
 
-      --color-surface: 255 255 255;
-      --color-on-surface: 0 0 0;
-      --color-on-surface-variant: 50 65 87;
-      --color-surface-container-low: 248 250 252;
-      --color-surface-container: 241 245 249;
+      --color-surface:                255 255 255;
+      --color-on-surface:             15 20 30;
+      --color-on-surface-variant:     75 90 110;
+      --color-surface-container-low:  248 250 252;
+      --color-surface-container:      241 245 249;
       --color-surface-container-high: 227 233 241;
 
-      --color-outline: 98 116 142;
-      --color-outline-variant: 144 161 185;
+      --color-outline:         180 196 216;
+      --color-outline-variant: 210 220 234;
 
-      --color-error: 231 0 11;
-      --color-error-container: 255 226 226;
+      --color-error:           220 38 38;
+      --color-error-container: 255 228 228;
 
       --color-shadow: 0 0 0;
+
+      /* Layout constants — CSS-variable-driven so breakpoints only override the var */
+      --sidebar-w: 280px;
+      --appbar-h:  56px;
+      --transition: 0.22s;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
 
     body {
       font-family: 'DM Sans', sans-serif;
       background: rgb(var(--color-surface-container-low));
       color: rgb(var(--color-on-surface));
-      height: 100vh;
+      height: 100%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
