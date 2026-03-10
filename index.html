@@ -948,9 +948,6 @@
     renderNotesList(e.target.value);
   });
 
-  // Mobile: back button opens the slide-in sidebar to return to the list
-  document.getElementById('backBtn').addEventListener('click', openSidebar);
-
   // Mobile: hamburger in app bar toggles sidebar
   document.getElementById('sidebarToggleBtn').addEventListener('click', () => {
     document.getElementById('sidebar').classList.contains('open')
