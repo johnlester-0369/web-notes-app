@@ -5,7 +5,7 @@
 /* global lucide */
 
 import { loadNotes } from './storage.js';
-import { renderNotesList } from './ui.js';
+import { renderNotesList, showDeleteModal } from './ui.js';
 import { createNote, deleteNote, selectNote, scheduleAutoSave } from './notes.js';
 import { openSidebar, closeSidebar } from './sidebar.js';
 import { state } from './state.js';
@@ -18,7 +18,8 @@ document.getElementById('newNoteBtn2').addEventListener('click', createNote);
 document.getElementById('fabNewNoteBtn').addEventListener('click', createNote);
 
 document.getElementById('deleteNoteBtn').addEventListener('click', () => {
-  if (state.activeNoteId) deleteNote(state.activeNoteId);
+  // Show confirmation modal before deleting — one-way action that cannot be undone
+  if (state.activeNoteId) showDeleteModal(() => deleteNote(state.activeNoteId));
 });
 
 document.getElementById('noteTitleInput').addEventListener('input', e => {
