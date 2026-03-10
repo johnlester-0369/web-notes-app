@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <!-- DM Sans: clean humanist sans-serif; approachable without being bland -->
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <!-- Lucide UMD build — exposes global `lucide`; must load before createIcons() calls in the init block -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     /* ── Design tokens — raw RGB channels, consumed via rgb(var(--token)) ── */
     :root {
@@ -325,6 +327,12 @@
     }
 
     .back-btn { display: none; }
+
+    /* Lucide SVG sizing — createIcons() defaults to 24px; each context needs its own override */
+    .btn-primary svg { width: 16px; height: 16px; }
+    .search-icon { width: 15px; height: 15px; }
+    .no-note-selected__icon svg { width: 44px; height: 44px; display: block; }
+    .empty-state__icon svg { width: 30px; height: 30px; display: block; }
   </style>
 </head>
 <body>
@@ -332,10 +340,7 @@
 <header class="app-bar">
   <span class="app-bar__title">Notes</span>
   <button class="btn btn-primary" id="newNoteBtn" aria-label="Create new note">
-    <!-- Plus icon -->
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
+    <i data-lucide="plus" aria-hidden="true"></i>
     New Note
   </button>
 </header>
@@ -345,9 +350,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar__top">
       <div class="search-wrapper">
-        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
+        <i data-lucide="search" class="search-icon" aria-hidden="true"></i>
         <input
           class="search-input"
           type="search"
@@ -366,7 +369,7 @@
 
     <!-- Shown when no note is active -->
     <div class="no-note-selected" id="noNoteSelected">
-      <div class="no-note-selected__icon" aria-hidden="true">📝</div>
+      <div class="no-note-selected__icon" aria-hidden="true"><i data-lucide="notebook-pen"></i></div>
       <div class="no-note-selected__text">No note selected</div>
       <div class="no-note-selected__hint">Create a new note or pick one from the list</div>
     </div>
@@ -375,19 +378,11 @@
     <div id="editorPanel" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
       <div class="editor__toolbar">
         <button class="btn-icon back-btn" id="backBtn" aria-label="Back to list">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
+          <i data-lucide="chevron-left" aria-hidden="true"></i>
         </button>
         <span class="editor__date" id="editorDate" aria-label="Last modified"></span>
         <button class="btn-icon danger" id="deleteNoteBtn" aria-label="Delete note" title="Delete note">
-          <!-- Trash icon -->
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6"/><path d="M14 11v6"/>
-            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-          </svg>
+          <i data-lucide="trash-2" aria-hidden="true"></i>
         </button>
       </div>
       <div class="editor__content">
@@ -501,9 +496,11 @@
     if (sorted.length === 0) {
       listEl.innerHTML = `
         <div class="empty-state" role="status">
-          <div class="empty-state__icon" aria-hidden="true">${q ? '🔍' : '📋'}</div>
+          <div class="empty-state__icon" aria-hidden="true">${q ? '<i data-lucide="search"></i>' : '<i data-lucide="file-text"></i>'}</div>
           <div class="empty-state__text">${q ? 'No matches found' : 'No notes yet'}</div>
         </div>`;
+      // Re-initialize Lucide after dynamic innerHTML injection — the startup createIcons() only sees the original DOM
+      lucide.createIcons();
       return;
     }
 
@@ -633,6 +630,8 @@
 
   loadNotes();
   renderNotesList();
+  // Convert all static <i data-lucide> elements to inline SVGs now that the full DOM is ready
+  lucide.createIcons();
 
   // Open the most recently touched note on load so the user lands in context
   if (notes.length > 0) {
