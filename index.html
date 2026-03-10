@@ -6,40 +6,46 @@
   <title>Notes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <!-- DM Sans: clean humanist sans-serif; approachable without being bland -->
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
-  <!-- Lucide UMD build — exposes global `lucide`; must load before createIcons() calls in the init block -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <!-- Lucide UMD build — exposes global `lucide`; must load before createIcons() calls -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     /* ── Design tokens — raw RGB channels, consumed via rgb(var(--token)) ── */
     :root {
-      --color-primary: 68 114 210;
-      --color-on-primary: 255 255 255;
-      --color-primary-container: 221 232 254;
+      --color-primary:              68 114 210;
+      --color-on-primary:           255 255 255;
+      --color-primary-container:    221 232 254;
       --color-on-primary-container: 26 48 95;
 
-      --color-surface: 255 255 255;
-      --color-on-surface: 0 0 0;
-      --color-on-surface-variant: 50 65 87;
-      --color-surface-container-low: 248 250 252;
-      --color-surface-container: 241 245 249;
+      --color-surface:                255 255 255;
+      --color-on-surface:             15 20 30;
+      --color-on-surface-variant:     75 90 110;
+      --color-surface-container-low:  248 250 252;
+      --color-surface-container:      241 245 249;
       --color-surface-container-high: 227 233 241;
 
-      --color-outline: 98 116 142;
-      --color-outline-variant: 144 161 185;
+      --color-outline:         180 196 216;
+      --color-outline-variant: 210 220 234;
 
-      --color-error: 231 0 11;
-      --color-error-container: 255 226 226;
+      --color-error:           220 38 38;
+      --color-error-container: 255 228 228;
 
       --color-shadow: 0 0 0;
+
+      /* Layout constants — CSS-variable-driven so breakpoints only override the var */
+      --sidebar-w: 280px;
+      --appbar-h:  56px;
+      --transition: 0.22s;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
 
     body {
       font-family: 'DM Sans', sans-serif;
       background: rgb(var(--color-surface-container-low));
       color: rgb(var(--color-on-surface));
-      height: 100vh;
+      height: 100%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -47,54 +53,68 @@
 
     /* ── App bar ── */
     .app-bar {
-      height: 56px;
+      height: var(--appbar-h);
       background: rgb(var(--color-surface));
       border-bottom: 1px solid rgb(var(--color-outline-variant));
       display: flex;
       align-items: center;
       padding: 0 16px;
-      gap: 12px;
+      gap: 10px;
       flex-shrink: 0;
-      /* Slight elevation to separate app chrome from content */
-      box-shadow: 0 1px 3px rgba(var(--color-shadow), 0.06);
+      z-index: 20;
+      box-shadow: 0 1px 0 rgb(var(--color-outline-variant));
+    }
+
+    /* Branded logo chip — anchors app identity without a full wordmark */
+    .app-bar__logo {
+      width: 28px;
+      height: 28px;
+      background: rgb(var(--color-primary));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: white;
     }
 
     .app-bar__title {
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 600;
       color: rgb(var(--color-on-surface));
       flex: 1;
+      letter-spacing: -0.01em;
     }
 
-    /* ── Buttons ── */
+    /* ── Button system ── */
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 18px;
+      padding: 8px 16px;
       border: none;
-      border-radius: 20px;
+      border-radius: 8px;
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       transition: opacity 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
     }
 
     .btn-primary {
       background: rgb(var(--color-primary));
       color: rgb(var(--color-on-primary));
     }
-
-    .btn-primary:hover { opacity: 0.9; box-shadow: 0 2px 6px rgba(var(--color-shadow), 0.18); }
-    .btn-primary:active { opacity: 0.85; }
+    .btn-primary:hover  { opacity: 0.88; box-shadow: 0 2px 8px rgba(var(--color-primary), 0.3); }
+    .btn-primary:active { opacity: 0.80; }
 
     .btn-icon {
       background: transparent;
       border: none;
       width: 36px;
       height: 36px;
-      border-radius: 50%;
+      border-radius: 8px;
       cursor: pointer;
       color: rgb(var(--color-on-surface-variant));
       display: inline-flex;
@@ -103,31 +123,81 @@
       transition: background 0.15s, color 0.15s;
       flex-shrink: 0;
     }
+    .btn-icon:hover { background: rgb(var(--color-surface-container)); color: rgb(var(--color-on-surface)); }
 
-    .btn-icon:hover { background: rgba(var(--color-on-surface), 0.08); }
-
-    /* Danger variant — red tint on hover for delete affordance */
+    /* Red affordance signals destructive action before click */
     .btn-icon.danger:hover {
       background: rgb(var(--color-error-container));
       color: rgb(var(--color-error));
     }
 
     /* ── Layout shell ── */
-    .layout { display: flex; flex: 1; overflow: hidden; }
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Mobile overlay — dims content behind open sidebar ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: var(--appbar-h);
+      inset-inline: 0;
+      bottom: 0;
+      background: rgba(var(--color-shadow), 0.28);
+      z-index: 9;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .sidebar-overlay.active { opacity: 1; }
 
     /* ── Sidebar ── */
     .sidebar {
-      width: 272px;
+      width: var(--sidebar-w);
       flex-shrink: 0;
-      background: rgb(var(--color-surface-container-low));
+      background: rgb(var(--color-surface));
       border-right: 1px solid rgb(var(--color-outline-variant));
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    .sidebar__top { padding: 12px 12px 4px; }
+    .sidebar__header {
+      padding: 14px 12px 12px;
+      border-bottom: 1px solid rgb(var(--color-outline-variant));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+    }
 
+    .sidebar__header-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar__section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgb(var(--color-on-surface-variant));
+      flex: 1;
+    }
+
+    /* Pill badge makes note count feel like a status chip, not raw copy */
+    .sidebar__count-badge {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgb(var(--color-on-surface-variant));
+      background: rgb(var(--color-surface-container));
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    /* ── Search ── */
     .search-wrapper { position: relative; }
 
     .search-icon {
@@ -137,39 +207,38 @@
       transform: translateY(-50%);
       color: rgb(var(--color-on-surface-variant));
       pointer-events: none;
+      opacity: 0.55;
     }
 
     .search-input {
       width: 100%;
       padding: 8px 12px 8px 34px;
-      background: rgb(var(--color-surface-container));
-      border: 1.5px solid transparent;
+      background: rgb(var(--color-surface-container-low));
+      border: 1.5px solid rgb(var(--color-outline-variant));
       border-radius: 8px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
+      font-size: 13.5px;
       color: rgb(var(--color-on-surface));
       outline: none;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+    .search-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.5; }
+    .search-input:focus {
+      border-color: rgb(var(--color-primary));
+      background: rgb(var(--color-surface));
+      /* Soft glow ring — consistent with input focus convention throughout the app */
+      box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
     }
 
-    .search-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.6; }
-    .search-input:focus { border-color: rgb(var(--color-primary)); background: rgb(var(--color-surface)); }
-
-    .sidebar__count {
-      padding: 8px 16px 4px;
-      font-size: 12px;
-      color: rgb(var(--color-on-surface-variant));
-      font-weight: 500;
-    }
-
+    /* ── Notes list ── */
     .notes-list {
       flex: 1;
       overflow-y: auto;
-      padding: 0 8px 8px;
+      padding: 6px 8px 8px;
     }
 
-    /* Thin scrollbar — doesn't distract from content */
-    .notes-list::-webkit-scrollbar { width: 4px; }
+    /* Thin scrollbar — doesn't compete visually with note content */
+    .notes-list::-webkit-scrollbar { width: 3px; }
     .notes-list::-webkit-scrollbar-track { background: transparent; }
     .notes-list::-webkit-scrollbar-thumb {
       background: rgb(var(--color-outline-variant));
@@ -177,62 +246,68 @@
     }
 
     .note-item {
-      padding: 12px;
+      padding: 11px 12px;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.1s;
-      border: 1.5px solid transparent;
+      transition: background 0.12s;
+      border: 1px solid transparent;
       margin-bottom: 2px;
     }
+    .note-item:hover { background: rgb(var(--color-surface-container-low)); }
 
-    .note-item:hover { background: rgb(var(--color-surface-container)); }
-
-    /* Active state uses primary-container so it's clearly selected but not heavy */
+    /* Primary-container communicates selection without heavy visual weight */
     .note-item.active {
       background: rgb(var(--color-primary-container));
-      border-color: rgba(var(--color-primary), 0.25);
+      border-color: rgba(var(--color-primary), 0.18);
     }
 
     .note-item__title {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 500;
       color: rgb(var(--color-on-surface));
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       margin-bottom: 3px;
+      line-height: 1.4;
     }
-
     .note-item.active .note-item__title { color: rgb(var(--color-on-primary-container)); }
 
     .note-item__preview {
-      font-size: 13px;
+      font-size: 12.5px;
       color: rgb(var(--color-on-surface-variant));
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
+      opacity: 0.8;
+      line-height: 1.4;
     }
 
-    .note-item__date { font-size: 11px; color: rgb(var(--color-on-surface-variant)); opacity: 0.8; }
+    .note-item__date {
+      font-size: 11px;
+      color: rgb(var(--color-on-surface-variant));
+      opacity: 0.6;
+    }
 
     /* ── Empty state ── */
     .empty-state {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 16px;
-      gap: 6px;
+      padding: 48px 20px 32px;
+      gap: 4px;
       color: rgb(var(--color-on-surface-variant));
       text-align: center;
     }
+    .empty-state__icon { opacity: 0.28; margin-bottom: 8px; }
+    .empty-state__label { font-size: 13.5px; font-weight: 500; }
+    .empty-state__sublabel { font-size: 12px; opacity: 0.65; margin-top: 3px; }
 
-    .empty-state__icon { font-size: 30px; opacity: 0.45; margin-bottom: 4px; }
-    .empty-state__text { font-size: 13px; }
-
-    /* ── Editor ── */
-    .editor {
+    /* ── Editor area ── */
+    .editor-area {
       flex: 1;
+      min-width: 0; /* prevent flex child from overflowing on narrow viewports */
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -242,52 +317,96 @@
     .editor__toolbar {
       display: flex;
       align-items: center;
-      padding: 8px 20px;
+      padding: 0 16px;
+      height: 48px;
       border-bottom: 1px solid rgb(var(--color-outline-variant));
-      min-height: 52px;
       gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .editor__meta {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1px;
     }
 
     .editor__date {
       font-size: 12px;
       color: rgb(var(--color-on-surface-variant));
-      flex: 1;
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* Constrain line length for comfortable reading */
-    .editor__content {
+    /* Fades in/out below the date — doesn't shift layout when hidden */
+    .editor__save-status {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgb(var(--color-primary));
+      height: 14px;
+      opacity: 1;
+      transition: opacity 0.4s;
+    }
+    .editor__save-status.hidden { opacity: 0; }
+
+    /* Scrollable writing surface — separate from the sticky toolbar and stats bar */
+    .editor__scroll {
       flex: 1;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      padding: 28px 40px 40px;
-      max-width: 760px;
+    }
+    .editor__scroll::-webkit-scrollbar { width: 4px; }
+    .editor__scroll::-webkit-scrollbar-track { background: transparent; }
+    .editor__scroll::-webkit-scrollbar-thumb {
+      background: rgb(var(--color-outline-variant));
+      border-radius: 2px;
+    }
+
+    /* Max-width constrains line length for comfortable reading at ~70 chars */
+    .editor__content {
+      padding: 32px 48px 48px;
+      max-width: 740px;
       width: 100%;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .editor__title-input {
       font-family: 'DM Sans', sans-serif;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 600;
       color: rgb(var(--color-on-surface));
       border: none;
       outline: none;
       background: transparent;
       width: 100%;
-      margin-bottom: 16px;
       padding: 0;
       resize: none;
       overflow: hidden;
       line-height: 1.3;
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
     }
+    .editor__title-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.28; }
 
-    .editor__title-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.4; }
+    /* Horizontal rule separates title from body — improves visual hierarchy without a border on inputs */
+    .editor__divider {
+      height: 1px;
+      background: rgb(var(--color-outline-variant));
+      margin: 14px 0 16px;
+    }
 
     .editor__body-input {
       font-family: 'DM Sans', sans-serif;
       font-size: 15px;
-      line-height: 1.75;
+      line-height: 1.8;
       color: rgb(var(--color-on-surface));
       border: none;
       outline: none;
@@ -295,11 +414,26 @@
       width: 100%;
       flex: 1;
       resize: none;
-      min-height: 300px;
+      min-height: 240px;
       padding: 0;
     }
+    .editor__body-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.3; }
 
-    .editor__body-input::placeholder { color: rgb(var(--color-on-surface-variant)); opacity: 0.35; }
+    /* Stats footer — lightweight reference, not a distraction */
+    .editor__footer {
+      border-top: 1px solid rgb(var(--color-outline-variant));
+      padding: 6px 48px;
+      display: flex;
+      gap: 16px;
+      flex-shrink: 0;
+      background: rgb(var(--color-surface));
+    }
+
+    .editor__stat {
+      font-size: 11.5px;
+      color: rgb(var(--color-on-surface-variant));
+      opacity: 0.55;
+    }
 
     /* ── No-selection placeholder ── */
     .no-note-selected {
@@ -308,47 +442,143 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       color: rgb(var(--color-on-surface-variant));
-      background: rgb(var(--color-surface));
+      background: rgb(var(--color-surface-container-low));
       user-select: none;
+      padding: 32px;
+      text-align: center;
+    }
+    .no-note-selected__icon { opacity: 0.18; margin-bottom: 4px; }
+    .no-note-selected__text { font-size: 16px; font-weight: 500; opacity: 0.6; }
+    .no-note-selected__hint { font-size: 13px; opacity: 0.4; }
+    .no-note-selected__cta  { margin-top: 12px; }
+
+    /* ── Mobile FAB — floats above content, replaces header button ── */
+    .fab {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: rgb(var(--color-primary));
+      color: white;
+      border: none;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      /* Elevated shadow to float above the writing surface */
+      box-shadow: 0 4px 16px rgba(var(--color-primary), 0.38);
+      z-index: 25;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .fab:hover  { transform: scale(1.04); box-shadow: 0 6px 20px rgba(var(--color-primary), 0.44); }
+    .fab:active { transform: scale(0.96); }
+
+    /* ── Responsive breakpoints ── */
+
+    /* Tablet: narrower sidebar via variable override — no other layout change needed */
+    @media (max-width: 900px) and (min-width: 640px) {
+      :root { --sidebar-w: 240px; }
+      .editor__content { padding: 28px 36px 40px; }
+      .editor__footer  { padding: 6px 36px; }
     }
 
-    .no-note-selected__icon { font-size: 44px; opacity: 0.25; }
-    .no-note-selected__text { font-size: 15px; font-weight: 500; }
-    .no-note-selected__hint { font-size: 13px; opacity: 0.65; }
+    /* Mobile: sidebar becomes a fixed slide-in overlay */
+    @media (max-width: 639px) {
+      .sidebar {
+        position: fixed;
+        top: var(--appbar-h);
+        left: 0;
+        bottom: 0;
+        width: min(300px, 82vw);
+        z-index: 10;
+        /* Starts off-screen; `.open` slides it in */
+        transform: translateX(-100%);
+        transition: transform var(--transition) ease;
+        box-shadow: 4px 0 24px rgba(var(--color-shadow), 0.1);
+      }
 
-    /* ── Mobile: stack instead of side-by-side ── */
-    @media (max-width: 600px) {
-      .sidebar { width: 100%; position: absolute; z-index: 10; height: calc(100vh - 56px); }
-      .sidebar.mobile-hidden { display: none; }
-      .editor.mobile-hidden { display: none; }
+      .sidebar.open { transform: translateX(0); }
+
+      /* Overlay backdrop is only meaningful on mobile */
+      .sidebar-overlay { display: block; }
+
+      /* FAB replaces header New Note button on mobile */
+      .fab { display: inline-flex; }
+      .app-bar__new-btn { display: none !important; }
+
+      /* Back button navigates from editor back to sidebar panel */
       .back-btn { display: inline-flex !important; }
+
+      /* Extra bottom padding clears the FAB */
+      .editor__content { padding: 20px 20px 80px; }
+      .editor__footer  { padding: 6px 20px; }
     }
 
-    .back-btn { display: none; }
+    /* Very small phones */
+    @media (max-width: 380px) {
+      .app-bar        { padding: 0 12px; gap: 8px; }
+      .editor__content { padding: 16px 16px 80px; }
+      .editor__footer  { padding: 6px 16px; }
+    }
 
-    /* Lucide SVG sizing — createIcons() defaults to 24px; each context needs its own override */
-    .btn-primary svg { width: 16px; height: 16px; }
-    .search-icon { width: 15px; height: 15px; }
-    .no-note-selected__icon svg { width: 44px; height: 44px; display: block; }
-    .empty-state__icon svg { width: 30px; height: 30px; display: block; }
+    /* ── Default visibility states ── */
+    .back-btn           { display: none; }
+    .sidebar-toggle-btn { display: none; }
+
+    @media (max-width: 639px) {
+      .sidebar-toggle-btn { display: inline-flex; }
+    }
+
+    /* ── Lucide SVG sizing — per-context overrides ── */
+    .app-bar__logo  svg                  { width: 15px; height: 15px; }
+    .btn-primary    svg                  { width: 16px; height: 16px; }
+    .search-icon, .search-icon svg       { width: 15px; height: 15px; }
+    .no-note-selected__icon svg          { width: 56px; height: 56px; display: block; }
+    .empty-state__icon svg               { width: 32px; height: 32px; display: block; }
+    .fab svg                             { width: 24px; height: 24px; }
+
+    /* Keyboard focus ring — visible for accessibility, suppressed on mouse */
+    :focus-visible {
+      outline: 2px solid rgb(var(--color-primary));
+      outline-offset: 2px;
+    }
   </style>
 </head>
 <body>
 
+<!-- ── App bar ── -->
 <header class="app-bar">
+  <!-- Hamburger: mobile-only toggle; hidden on desktop via CSS -->
+  <button class="btn-icon sidebar-toggle-btn" id="sidebarToggleBtn"
+          aria-label="Toggle notes list" aria-expanded="false">
+    <i data-lucide="panel-left" aria-hidden="true"></i>
+  </button>
+  <div class="app-bar__logo" aria-hidden="true">
+    <i data-lucide="notebook-pen"></i>
+  </div>
   <span class="app-bar__title">Notes</span>
-  <button class="btn btn-primary" id="newNoteBtn" aria-label="Create new note">
+  <button class="btn btn-primary app-bar__new-btn" id="newNoteBtn" aria-label="Create new note">
     <i data-lucide="plus" aria-hidden="true"></i>
     New Note
   </button>
 </header>
 
+<!-- Mobile overlay — tap to dismiss sidebar without selecting a note -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
 <div class="layout">
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar__top">
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar" aria-label="Notes list">
+    <div class="sidebar__header">
+      <div class="sidebar__header-row">
+        <span class="sidebar__section-label">All Notes</span>
+        <span class="sidebar__count-badge" id="noteCount" aria-live="polite"></span>
+      </div>
       <div class="search-wrapper">
         <i data-lucide="search" class="search-icon" aria-hidden="true"></i>
         <input
@@ -361,17 +591,26 @@
         />
       </div>
     </div>
-    <div class="sidebar__count" id="noteCount" aria-live="polite"></div>
     <div class="notes-list" id="notesList" role="list"></div>
   </aside>
 
-  <main class="editor" id="editor" aria-label="Note editor">
+  <!-- ── Editor area ── -->
+  <main class="editor-area" id="editorArea" aria-label="Note editor">
 
-    <!-- Shown when no note is active -->
+    <!-- Shown when no note is open -->
     <div class="no-note-selected" id="noNoteSelected">
-      <div class="no-note-selected__icon" aria-hidden="true"><i data-lucide="notebook-pen"></i></div>
+      <div class="no-note-selected__icon" aria-hidden="true">
+        <i data-lucide="file-text"></i>
+      </div>
       <div class="no-note-selected__text">No note selected</div>
       <div class="no-note-selected__hint">Create a new note or pick one from the list</div>
+      <!-- Action affordance in the empty state so users aren't stranded -->
+      <div class="no-note-selected__cta">
+        <button class="btn btn-primary" id="newNoteBtn2" aria-label="Create new note">
+          <i data-lucide="plus" aria-hidden="true"></i>
+          New Note
+        </button>
+      </div>
     </div>
 
     <!-- Active note editor panel -->
@@ -380,30 +619,52 @@
         <button class="btn-icon back-btn" id="backBtn" aria-label="Back to list">
           <i data-lucide="chevron-left" aria-hidden="true"></i>
         </button>
-        <span class="editor__date" id="editorDate" aria-label="Last modified"></span>
+        <div class="editor__meta">
+          <span class="editor__date" id="editorDate" aria-label="Last modified"></span>
+          <!-- Save indicator lives below the date; occupies reserved height so layout is stable -->
+          <span class="editor__save-status hidden" id="saveStatus" aria-live="polite"></span>
+        </div>
         <button class="btn-icon danger" id="deleteNoteBtn" aria-label="Delete note" title="Delete note">
           <i data-lucide="trash-2" aria-hidden="true"></i>
         </button>
       </div>
-      <div class="editor__content">
-        <textarea
-          class="editor__title-input"
-          id="noteTitleInput"
-          placeholder="Untitled"
-          rows="1"
-          aria-label="Note title"
-        ></textarea>
-        <textarea
-          class="editor__body-input"
-          id="noteBodyInput"
-          placeholder="Start writing…"
-          aria-label="Note content"
-        ></textarea>
+
+      <!-- Scrollable writing surface; toolbar and footer are sticky outside this div -->
+      <div class="editor__scroll">
+        <div class="editor__content">
+          <textarea
+            class="editor__title-input"
+            id="noteTitleInput"
+            placeholder="Untitled"
+            rows="1"
+            aria-label="Note title"
+          ></textarea>
+          <!-- Divider creates clear visual separation between title and body -->
+          <div class="editor__divider" aria-hidden="true"></div>
+          <textarea
+            class="editor__body-input"
+            id="noteBodyInput"
+            placeholder="Start writing…"
+            aria-label="Note content"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Stats bar — passive reference, not interactive -->
+      <div class="editor__footer">
+        <span class="editor__stat" id="wordCountStat">0 words</span>
+        <span class="editor__stat" id="charCountStat">0 chars</span>
       </div>
     </div>
 
   </main>
 </div>
+
+<!-- Mobile FAB — floats above writing surface; FAB pattern is the de-facto standard
+     for primary actions on mobile, more reachable than the top-right app bar button -->
+<button class="fab" id="fabNewNoteBtn" aria-label="Create new note">
+  <i data-lucide="plus" aria-hidden="true"></i>
+</button>
 
 <script>
   // ── Utility ────────────────────────────────────────────────────────────────
