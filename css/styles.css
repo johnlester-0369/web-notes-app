@@ -531,3 +531,110 @@ body {
   outline: 2px solid rgb(var(--color-primary));
   outline-offset: 2px;
 }
+
+/* ── Delete confirmation modal ── */
+
+/* Fixed overlay — z-index 50 clears the sidebar (10), overlay (9), and FAB (25).
+   opacity+pointer-events toggle instead of display:none so the CSS transition fires. */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--color-shadow), 0.38);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-backdrop.open .modal {
+  animation: modal-slide-in 0.22s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+}
+
+@keyframes modal-slide-in {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.modal {
+  background: rgb(var(--color-surface));
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  width: min(400px, calc(100vw - 40px));
+  box-shadow:
+    0 8px 40px rgba(var(--color-shadow), 0.14),
+    0 2px 8px  rgba(var(--color-shadow), 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+/* Red icon chip mirrors the trash button's danger hover — primes the user for severity before they read the text */
+.modal__icon {
+  width: 48px;
+  height: 48px;
+  background: rgb(var(--color-error-container));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(var(--color-error));
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+.modal__icon svg { width: 22px; height: 22px; }
+
+.modal__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: rgb(var(--color-on-surface));
+  letter-spacing: -0.01em;
+}
+
+.modal__body {
+  font-size: 13.5px;
+  color: rgb(var(--color-on-surface-variant));
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+.modal__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* Ghost variant — understated so visual weight draws the eye to the danger button */
+.btn-ghost {
+  flex: 1;
+  background: transparent;
+  color: rgb(var(--color-on-surface-variant));
+  border: 1.5px solid rgb(var(--color-outline));
+}
+.btn-ghost:hover {
+  background: rgb(var(--color-surface-container));
+  color: rgb(var(--color-on-surface));
+  border-color: rgb(var(--color-outline-variant));
+}
+.btn-ghost:active { opacity: 0.75; }
+
+/* Danger variant — same error palette as the trash icon hover, intentional visual continuity */
+.btn-danger {
+  flex: 1;
+  background: rgb(var(--color-error));
+  color: rgb(var(--color-on-primary));
+}
+.btn-danger:hover  { opacity: 0.88; box-shadow: 0 2px 8px rgba(var(--color-error), 0.35); }
+.btn-danger:active { opacity: 0.80; }

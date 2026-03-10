@@ -127,6 +127,23 @@
   <i data-lucide="plus" aria-hidden="true"></i>
 </button>
 
+<!-- Delete confirmation modal — aria-hidden toggled by showDeleteModal / hideDeleteModal in ui.js.
+     Placed in static HTML so lucide.createIcons() on init captures the trash-2 icon inside it. -->
+<div class="modal-backdrop" id="deleteModal" role="dialog" aria-modal="true"
+     aria-labelledby="deleteModalTitle" aria-hidden="true">
+  <div class="modal">
+    <div class="modal__icon" aria-hidden="true">
+      <i data-lucide="trash-2"></i>
+    </div>
+    <h2 class="modal__title" id="deleteModalTitle">Delete note?</h2>
+    <p class="modal__body">This can't be undone. The note will be permanently removed.</p>
+    <div class="modal__actions">
+      <button class="btn btn-ghost" id="deleteModalCancel">Cancel</button>
+      <button class="btn btn-danger" id="deleteModalConfirm">Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- Module defers automatically; Lucide UMD loaded above will have executed by then -->
 <script type="module" src="js/main.js"></script>
 

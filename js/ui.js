@@ -94,3 +94,43 @@ export function renderNotesList(query = '', onSelectNote) {
     });
   });
 }
+
+// showDeleteModal / hideDeleteModal belong to the rendering layer — same rationale as
+// renderNotesList accepting onSelectNote: keeps notes.js free of direct DOM modal concerns.
+
+export function showDeleteModal(onConfirm) {
+  const backdrop   = document.getElementById('deleteModal');
+  const confirmBtn = document.getElementById('deleteModalConfirm');
+  const cancelBtn  = document.getElementById('deleteModalCancel');
+
+  // Replace nodes to shed stale listeners from prior openings without removeEventListener bookkeeping
+  const freshConfirm = confirmBtn.cloneNode(true);
+  const freshCancel  = cancelBtn.cloneNode(true);
+  confirmBtn.replaceWith(freshConfirm);
+  cancelBtn.replaceWith(freshCancel);
+
+  freshConfirm.addEventListener('click', () => { hideDeleteModal(); onConfirm(); });
+  freshCancel.addEventListener('click', hideDeleteModal);
+
+  // Click on the dimmed backdrop area (not the card) dismisses without deleting
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) hideDeleteModal();
+  }, { once: true });
+
+  // Escape key dismissal — standard accessible dialog behaviour (ARIA APG modal pattern)
+  function onEsc(e) {
+    if (e.key === 'Escape') { hideDeleteModal(); document.removeEventListener('keydown', onEsc); }
+  }
+  document.addEventListener('keydown', onEsc);
+
+  backdrop.setAttribute('aria-hidden', 'false');
+  backdrop.classList.add('open');
+  // Focus Cancel by default — keyboard users must opt in to the destructive action, not out
+  freshCancel.focus();
+}
+
+export function hideDeleteModal() {
+  const backdrop = document.getElementById('deleteModal');
+  backdrop.classList.remove('open');
+  backdrop.setAttribute('aria-hidden', 'true');
+}
