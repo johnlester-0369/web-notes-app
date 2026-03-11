@@ -14,6 +14,15 @@ Most note-taking tools demand cloud sync, a sign-up flow, or a bundler before yo
 
 No install. No package manager. Two options:
 
+**Clone the repo**
+
+```bash
+git clone https://github.com/johnlester-0369/web-notes-app.git
+cd web-notes-app
+```
+
+Then choose how to open it:
+
 **Option A — Local static server (recommended)**
 
 ES Module imports require a server in some browsers due to CORS restrictions:
