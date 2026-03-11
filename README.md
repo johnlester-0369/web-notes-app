@@ -170,7 +170,7 @@ Six focused ES modules, each owning a single concern. `main.js` is pure event-wi
 ## File Structure
 
 ```
-web-note-app/
+web-notes-app/
 ├── css/
 │   └── styles.css         # Design tokens, component styles, responsive breakpoints
 ├── docs/
